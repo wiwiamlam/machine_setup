@@ -1,3 +1,7 @@
+Use nvim config
+
 ```
-./setup.sh [mini]
+ln -s $(pwd)/.config ~/.config
 ```
+
+TODO: setup.sh is broken for now
