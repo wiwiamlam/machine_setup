@@ -30,6 +30,7 @@ Plug('ray-x/lsp_signature.nvim')
 
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug('nvim-treesitter/nvim-treesitter-context')
+Plug('theHamsta/nvim-treesitter-pairs')
 
 Plug('RRethy/vim-illuminate')
 
@@ -40,6 +41,8 @@ Plug('sainnhe/gruvbox-material')
 Plug('stevearc/aerial.nvim')
 
 Plug('lewis6991/gitsigns.nvim')
+Plug('tpope/vim-fugitive')
+Plug('petertriho/nvim-scrollbar')
 vim.call('plug#end')
 
 require('plugins/nvim-tree')
@@ -50,10 +53,46 @@ require('plugins/treesitter')
 
 require'treesitter-context'
 require'illuminate'
+
+-- change the highlight style
+vim.api.nvim_set_hl(0, "IlluminatedWordText", { link = "Visual" })
+vim.api.nvim_set_hl(0, "IlluminatedWordRead", { link = "Visual" })
+vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { link = "Visual" })
+
+--- auto update the highlight style on colorscheme change
+vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+  pattern = { "*" },
+  callback = function(ev)
+    vim.api.nvim_set_hl(0, "IlluminatedWordText", { link = "Visual" })
+    vim.api.nvim_set_hl(0, "IlluminatedWordRead", { link = "Visual" })
+    vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { link = "Visual" })
+  end
+})
+
+
+
 require'fzf-lua'
 
 require('gitsigns').setup()
-
+require("scrollbar").setup({
+    handle = {
+        text = " ",
+        blend = 30, -- Integer between 0 and 100. 0 for fully opaque and 100 to full transparent. Defaults to 30.
+        color = "#5c6370",
+        color_nr = nil, -- cterm
+        highlight = "CursorColumn",
+        hide_if_all_visible = true, -- Hides handle if all lines are visible
+    },
+    handlers = {
+        cursor = false,
+        diagnostic = true,
+        gitsigns = true, -- Requires gitsigns
+        handle = true,
+        search = false, -- Requires hlslens
+        ale = false, -- Requires ALE
+    },
+}
+)
 
 local signature_config = {
   log_path = vim.fn.expand("$HOME") .. "/tmp/sig.log",
@@ -69,6 +108,7 @@ require("lsp_signature").setup(signature_config)
 -- We prepend it with 'silent!' to ignore errors when it's not yet installed.
 vim.g.gruvbox_material_background = "dark"
 vim.cmd('silent! colorscheme gruvbox-material')
+vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#504945' })
 
 vim.g['deoplete#enable_at_startup'] = 1
 
@@ -119,6 +159,8 @@ vim.api.nvim_set_keymap("n", "<C-e>", ":NvimTreeOpen<cr>", { noremap = true, sil
 vim.api.nvim_set_keymap("n", "tt", ":AerialToggle<cr>", { noremap = true, silent = true })
 
 vim.keymap.set("v", "<leader>c", '"+y', { noremap = true })
+vim.keymap.set('n', '<C-a>c', ':%y+<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>q', ':q<CR>', { noremap = true, silent = true })
 
 
 vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
@@ -128,5 +170,5 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
     end,
 })
 
-
+vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#fe8019', fg = '#282828', bold = true })  -- orange
 
