@@ -10,6 +10,7 @@ vim.env.BAT_THEME = "base16-256"
 vim.call('plug#begin', '~/.nvim/plugged')
 Plug('vim-airline/vim-airline')
 Plug('nvim-tree/nvim-tree.lua')
+-- hack nerd font
 Plug('nvim-tree/nvim-web-devicons')
 
 Plug('ibhagwan/fzf-lua')
