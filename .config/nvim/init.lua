@@ -5,12 +5,11 @@ local Plug = vim.fn['plug#']
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.expand("~/.config/nvim/undo")
 
-vim.env.BAT_THEME = "base16-256"
+-- vim.env.BAT_THEME = "base16-256"
 
 vim.call('plug#begin', '~/.nvim/plugged')
-Plug('vim-airline/vim-airline')
+Plug('nvim-lualine/lualine.nvim')
 Plug('nvim-tree/nvim-tree.lua')
--- hack nerd font
 Plug('nvim-tree/nvim-web-devicons')
 
 Plug('ibhagwan/fzf-lua')
@@ -36,24 +35,35 @@ Plug('theHamsta/nvim-treesitter-pairs')
 Plug('RRethy/vim-illuminate')
 
 Plug('windwp/nvim-autopairs')
-Plug('sainnhe/gruvbox-material')
+Plug('ellisonleao/gruvbox.nvim')
 
 -- taglist alternative
 Plug('stevearc/aerial.nvim')
 
 Plug('lewis6991/gitsigns.nvim')
 Plug('tpope/vim-fugitive')
-Plug('petertriho/nvim-scrollbar')
+
+Plug('romgrk/barbar.nvim')
 vim.call('plug#end')
 
+require'barbar'.setup {
+  sidebar_filetypes = {
+    -- Configure nvim-tree to "push" barbar’s tabs right
+    NvimTree = true
+  }
+}
 require('plugins/nvim-tree')
 require('plugins/nvim-cmp')
 require('nvim-autopairs').setup()
 require('aerial').setup()
+require('lualine').setup()
 require('plugins/treesitter')
 
 require'treesitter-context'
 require'illuminate'
+
+vim.o.background = "dark" -- or "light" for light mode
+vim.cmd([[colorscheme gruvbox]])
 
 -- change the highlight style
 vim.api.nvim_set_hl(0, "IlluminatedWordText", { link = "Visual" })
@@ -74,26 +84,7 @@ vim.api.nvim_create_autocmd({ "ColorScheme" }, {
 
 require'fzf-lua'
 
-require('gitsigns').setup()
-require("scrollbar").setup({
-    handle = {
-        text = " ",
-        blend = 30, -- Integer between 0 and 100. 0 for fully opaque and 100 to full transparent. Defaults to 30.
-        color = "#5c6370",
-        color_nr = nil, -- cterm
-        highlight = "CursorColumn",
-        hide_if_all_visible = true, -- Hides handle if all lines are visible
-    },
-    handlers = {
-        cursor = false,
-        diagnostic = true,
-        gitsigns = true, -- Requires gitsigns
-        handle = true,
-        search = false, -- Requires hlslens
-        ale = false, -- Requires ALE
-    },
-}
-)
+require('gitsigns').setup({ word_diff = true })
 
 local signature_config = {
   log_path = vim.fn.expand("$HOME") .. "/tmp/sig.log",
@@ -107,8 +98,6 @@ require("lsp_signature").setup(signature_config)
 
 -- Color schemes should be loaded after plug#end().
 -- We prepend it with 'silent!' to ignore errors when it's not yet installed.
-vim.g.gruvbox_material_background = "dark"
-vim.cmd('silent! colorscheme gruvbox-material')
 vim.api.nvim_set_hl(0, 'CursorLine', { bg = '#504945' })
 
 vim.g['deoplete#enable_at_startup'] = 1
@@ -141,7 +130,7 @@ vim.opt.list = true
 vim.opt.listchars = { tab = "» ", extends = "›", precedes = "‹", nbsp = "·", trail = "·" }
 
 -- Timing and search
-vim.opt.updatetime = 100                           -- Faster update time for better UI responsiveness
+vim.opt.updatetime = 500                           -- Faster update time for better UI responsiveness
 vim.opt.hlsearch = true                            -- Highlight search matches
 vim.opt.incsearch = true                           -- Incremental search
 
