@@ -30,7 +30,7 @@ Plug('ray-x/lsp_signature.nvim')
 
 Plug('nvim-treesitter/nvim-treesitter', { ['do'] = ':TSUpdate' })
 Plug('nvim-treesitter/nvim-treesitter-context')
-Plug('theHamsta/nvim-treesitter-pairs')
+Plug('theHamsta/nvim-treesitter-pairs', { ['on'] = 'TSUpdate' })
 
 Plug('RRethy/vim-illuminate')
 
@@ -57,13 +57,19 @@ require('plugins/nvim-cmp')
 require('nvim-autopairs').setup()
 require('aerial').setup()
 require('lualine').setup()
-require('plugins/treesitter')
+-- require('plugins/treesitter')
 
 require'treesitter-context'
 require'illuminate'
 
 vim.o.background = "dark" -- or "light" for light mode
 vim.cmd([[colorscheme gruvbox]])
+
+vim.api.nvim_set_hl(0, "NvimTreeWindowPicker", {
+  fg = "#fbf1c7", -- light fg
+  bg = "#3c3836", -- dark grey bg
+  bold = true,
+})
 
 -- change the highlight style
 vim.api.nvim_set_hl(0, "IlluminatedWordText", { link = "Visual" })
@@ -81,10 +87,32 @@ vim.api.nvim_create_autocmd({ "ColorScheme" }, {
 })
 
 
+require('fzf-lua').setup({
+  -- The 'files' provider uses 'fd' by default
+  files = {
+    -- Use fd_opts to pass arguments to fd
+    -- '--exclude' is the flag to ignore a pattern
+    fd_opts = "--hidden --follow --exclude 'tags'",
+  },
 
-require'fzf-lua'
+  -- The 'live_grep' and 'grep' providers use 'ripgrep' (rg)
+  live_grep = {
+    -- Use rg_opts to pass arguments to rg
+    -- '--glob "!"' is the flag to exclude a file glob pattern
+    -- The quotes are important!
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob '!tags'",
+  },
 
-require('gitsigns').setup({ word_diff = true })
+  grep = {
+    -- Also apply the same options to the regular grep
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob '!tags'",
+  },
+
+  -- ... other fzf-lua settings
+})
+-- require'fzf-lua'
+
+require('gitsigns').setup()
 
 local signature_config = {
   log_path = vim.fn.expand("$HOME") .. "/tmp/sig.log",
@@ -112,6 +140,8 @@ vim.opt.wildmenu = true                            -- Visual autocomplete for co
 vim.opt.whichwrap:append("<,>,[,]")
 vim.opt.backspace = { "indent", "eol", "start" }
 vim.opt.mouse = "a"                                -- Enable mouse in all modes
+vim.opt.autoread = true                            -- auto-reload
+vim.opt.expandtab = true
 -- vim.opt.textwidth = 80                           -- Uncomment to set max text width to 80
 
 -- Tab and indentation settings
@@ -133,6 +163,9 @@ vim.opt.listchars = { tab = "» ", extends = "›", precedes = "‹", nbsp = "·
 vim.opt.updatetime = 500                           -- Faster update time for better UI responsiveness
 vim.opt.hlsearch = true                            -- Highlight search matches
 vim.opt.incsearch = true                           -- Incremental search
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  command = "checktime",
+})
 
 -- use space as leader key
 vim.g.mapleader = " "
@@ -161,4 +194,6 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
 })
 
 vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#fe8019', fg = '#282828', bold = true })  -- orange
-
+-- Press <leader>s after hitting * on a word
+-- Used for quickly replaced all same word in the buffer
+vim.keymap.set("n", "<leader>s", ":%s///g<Left><Left>")
